@@ -1,0 +1,50 @@
+--SESSION 1
+
+DECLARE 
+V_ID mult_version_teste.ID%TYPE := 1;
+V_NAME mult_version_teste.NAME%TYPE;
+V_DT_BIRTH mult_version_teste.DT_BIRTH%TYPE;
+V_NM_BIRTH_CITY mult_version_teste.NM_BIRTH_CITY%TYPE;
+
+BEGIN 
+	
+	SELECT NAME,DT_BIRTH,NM_BIRTH_CITY INTO V_NAME,V_DT_BIRTH,V_NM_BIRTH_CITY FROM mult_version_teste WHERE ID = V_ID;
+		
+	--DBMS_OUTPUT.PUT_LINE(V_ID || ' ' || V_NAME || ' ' || V_DT_BIRTH || ' ' || V_NM_BIRTH_CITY);
+	
+	V_DT_BIRTH := TO_DATE('19800605','YYYYMMDD');
+	
+	sys.DBMS_LOCK.SLEEP (20);
+	
+	UPDATE mult_version_teste SET NAME = V_NAME , DT_BIRTH = V_DT_BIRTH , NM_BIRTH_CITY = V_NM_BIRTH_CITY
+	WHERE ID = V_ID;
+	
+	DBMS_OUTPUT.PUT_LINE(V_ID || ' ' || V_NAME || ' ' || V_DT_BIRTH || ' ' || V_NM_BIRTH_CITY);
+
+COMMIT;
+END;
+
+--SESSION 2 
+DECLARE 
+V_ID mult_version_teste.ID%TYPE := 1;
+V_NAME mult_version_teste.NAME%TYPE;
+V_DT_BIRTH mult_version_teste.DT_BIRTH%TYPE;
+V_NM_BIRTH_CITY mult_version_teste.NM_BIRTH_CITY%TYPE;
+
+BEGIN 
+	
+	SELECT NAME,DT_BIRTH,NM_BIRTH_CITY INTO V_NAME,V_DT_BIRTH,V_NM_BIRTH_CITY FROM mult_version_teste WHERE ID = V_ID;
+		
+	--DBMS_OUTPUT.PUT_LINE(V_ID || ' ' || V_NAME || ' ' || V_DT_BIRTH || ' ' || V_NM_BIRTH_CITY);
+	
+	V_NM_BIRTH_CITY := 'SANTOS';
+	
+	sys.DBMS_LOCK.SLEEP (40);
+	
+	UPDATE mult_version_teste SET NAME = V_NAME , DT_BIRTH = V_DT_BIRTH , NM_BIRTH_CITY = V_NM_BIRTH_CITY
+	WHERE ID = V_ID;
+	
+	DBMS_OUTPUT.PUT_LINE(V_ID || ' ' || V_NAME || ' ' || V_DT_BIRTH || ' ' || V_NM_BIRTH_CITY);
+
+COMMIT;
+END;

@@ -1,0 +1,47 @@
+CREATE TABLE t 
+(
+x int PRIMARY KEY 
+,y varchar2(4000)
+)
+
+truncate TABLE t
+
+INSERT INTO t 
+SELECT 
+rownum 
+,rpad('*',140,'*')
+FROM dual CONNECT BY LEVEL <= 46
+
+SELECT length(y),dbms_rowid.rowid_block_number(rowid) AS blk 
+,count(1),min(x),max(x)
+FROM t
+GROUP BY 
+length(y),
+dbms_rowid.rowid_block_number(rowid)
+
+
+CREATE OR REPLACE PROCEDURE DO_UPDATE(P_N IN NUMBER) AS 
+pragma AUTONOMOUS_TRANSACTION;
+L_REC T%ROWTYPE;
+RESOURCE_BUSY EXCEPTION;
+PRAGMA EXCEPTION_INIT(RESOURCE_BUSY,-54);
+
+BEGIN 
+	SELECT * INTO L_REC FROM T WHERE X = P_N FOR UPDATE NOWAIT; 
+DO_UPDATE(P_N+1);
+COMMIT;
+
+EXCEPTION 
+WHEN RESOURCE_BUSY THEN 
+DBMS_OUTPUT.PUT_LINE('Locked out tryning to select row '|| p_n);
+COMMIT;
+
+WHEN no_data_found THEN 
+DBMS_OUTPUT.PUT_LINE('finished without problems ');
+COMMIT;
+
+END;
+
+BEGIN 
+	do_update(1);
+END;

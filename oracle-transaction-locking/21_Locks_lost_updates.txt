@@ -1,0 +1,12 @@
+Lost Updates
+Um erro muito comum que ocorre em diversas aplicações é o seguinte cenário:
+usuário 1: Consulta os dados do cliente A e os exibe em tela.
+usuário 2: Consulta os dados do cliente A e os exibe em tela.
+Usuário 1: Altera a informação de data de nascimento do cliente A
+Usuário 2: Altera a informação de local de nascimento do cliente A
+Usuário 1: Consulta as informações do cliente A e nota que a data de nascimento não foi alterada, ainda permanece com o valor antigo.
+
+Esse cenário ocorre pois o usuário 2 sobrescreveu as alterações do usuário 1, como a maior parte dos sistemas faz um update no registro completo que está em tela,
+o usuário 2 tinha em tela a data de nascimento antiga do cliente A e ao alterar o local de nascimento acabou sobrescrevendo a alteração do usuário 1.
+Esse erro ocorre pelo simples fato dos desenvolvedores desconhecerem como funcionam os mecanismos de lock do banco de dados que estão utilizando.
+Então, como resolvemos esse problema, conhecendo como os locks funcionam na base de dados ORACLE ?

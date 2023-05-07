@@ -1,0 +1,16 @@
+No caso de de locks otimistas , sempre esperamos que o registro nunca esteja bloqueado, ou que esteja bloqueado na grande minoria das vezes.
+Neste cenários esperamos para validar se o dado foi alterado somente ao final da transação e não no início como no cenário pessimista.
+Vale salientar que o cenário otmista não necessita que haja uma conexão permante do nossa aplicação com o banco de dados oracle.
+Existem algumas técnicas que podem ser implementadas para o cenário otimista, as mais usadas são:
+
+Comparar coluna a coluna alterada. Nesse cenário no comando de update você verifica se alguma coluna que você consultou antes de realizar a alteração foi modificada.
+Caso alguma tenha sido modificada o update não irá satisfazer todas as condições da cláusula WHERE, logo não afetará nenhuma linha, caso contrário a alteração será realizada.
+(exemplo 1)
+
+Utilizar campo de data de alteração na tabela. Nesse cenário, a cada alteração na tabela será atualizada uma coluna com a data e hora da última alteração.
+Portanto ao invés de comparar todos campos como no cenário anterior iremos somente comparar o campo da data de atualização.
+(exemplo 2)
+
+Utilizar campo de hasho na tabela. Nesse cenário, a cada alteração na tabela será atualizada uma coluna com o hash dos valores do registro.
+Portanto ao invés de comparar todos campos como no primeiro cenário iremos somente comparar o campo de hash.
+(exemplo 3)

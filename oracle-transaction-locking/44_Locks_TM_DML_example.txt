@@ -1,0 +1,17 @@
+UPDATE MULT_VERSION_TESTE SET name = lower(name)
+
+SELECT 
+s.USERNAME 
+,L.SID 
+,ID1
+,id2
+,lmode
+,request 
+,block
+,l.type
+FROM 
+v$lock l
+INNER JOIN v$session s  ON s.sid = l.sid
+WHERE l.type IN ('TM','TX')
+
+SELECT * FROM ALL_OBJECTS WHERE OBJECT_ID = 17829914

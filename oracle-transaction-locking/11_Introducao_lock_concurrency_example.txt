@@ -1,0 +1,15 @@
+--lock / concurrency example
+--session 1
+update mult_version_teste set name = 'fabio segato' where id = 1
+
+--session 2
+update mult_version_teste set name = 'fabio_segato' where id = 1
+essa session ficará presa esperando a session 1 validar a alteração
+
+--session 3
+update mult_version_teste set name = 'joão sanches' where id = 2
+como está alterando outro registro, a session 3 irá finalizar normalmente
+
+--session 1
+commit;
+automaticamente a session 2 é liberada

@@ -1,0 +1,32 @@
+UPDATE MULT_VERSION_TESTE SET name = upper(name)
+
+SELECT 
+s.USERNAME 
+,L.SID 
+,TRUNC(ID1/POWER(2,16)) RBS 
+,BITAND(ID1,TO_NUMBER('ffff','xxxx'))+0 AS slot
+,id2 AS seq
+,lmode
+,request 
+,block
+FROM 
+v$lock l
+INNER JOIN v$session s  ON s.sid = l.sid
+WHERE l.type = 'TX'
+
+UPDATE MULT_VERSION_TESTE SET name = lower(name)
+
+SELECT 
+sa.username AS user_blocker
+,sa.sid AS sid_blocker
+,sb.username AS user_blocked
+,sb.sid AS sid_blocked
+FROM 
+v$lock a 
+INNER JOIN v$lock b ON b.id1 = b.id1
+INNER JOIN v$session sa ON sa.sid = a.sid 
+INNER JOIN v$session sb ON sb.sid = b.sid 
+WHERE 
+a.block=1 AND b.request > 0
+
+SELECT * FROM dba_waiters

@@ -1,0 +1,38 @@
+Todo comando DDL é comitado automaticamente em caso de sucesso ou sofre rollback em caso de erro.
+
+BEGIN
+  commit;
+  DDL-STATMENT;
+  commit;
+EXCEPTION
+  WHEN OTHERS
+   rollback;
+END;
+
+Sempre que um comando DDL é executado a transação ativa é comitada, mesmo que o DDL retorne erro.
+
+Tipos de lock de DDL
+
+Exclusive: Não permite alteração de estrutura nem de dados
+
+Shared: Não permite alteração de estrutura mas pertime alteração de dados
+
+Breakable parse locks: São locks gerados por objetos compilados em memório como por exemplo uma query.
+Os objetos utilizados nessa query recebem esse tipo de lock, porém caso um desses objetos sofra uma alteração esse lock pode ser quebrado.
+Logo ao ser quebra isso gerará um erro na query que está sendo executada por exemplo pois o objeto que ela está lendo foi invalidado.
+
+Exclusive locks são requeridos geralmente quando executamos esses tipos de DDLs
+drop table, truncate table, alter table t move...
+Esses comandas não permitem que haja nem alteração de estrutura nem alteraçã de dados quando estão sendo executados.
+
+Shared locks são requeridos quando executamos comandos DDL do tipo ONLINE. Esse tipo ONLINE permite que ao mesmo tempo que o DDL é executado é possível a manipulação de dados.
+Um exemplo prático é o comando:
+
+CREATE INDEX I ON TABLE(X) ONLINE;
+
+
+
+
+
+
+

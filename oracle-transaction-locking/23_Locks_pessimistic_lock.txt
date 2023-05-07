@@ -1,0 +1,3 @@
+A perspectiva pessimista de lock parte de princípio que o lock será aplicado antes que haja a alteração do dado de fato, ou seja,
+antes de aplicar a alteração a aplicação irá aplicar um lock na linha e esse lock será mantido até que a transação finalize.
+Porém essa abordagem só funciona em aplicações onde uma conexão é estabelecida 100% do tempo com a aplicação, esse método statefull conection já não é tão utilizado no mercado.

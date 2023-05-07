@@ -1,0 +1,22 @@
+--Multiversioning example
+--session 1
+DECLARE 
+c sys_refcursor;
+v_col_name mult_version_teste.name%TYPE;
+ BEGIN 
+	 OPEN c FOR SELECT name FROM mult_version_teste;
+	 sys.DBMS_LOCK.SLEEP (60);
+	 LOOP 
+	 	fetch C into v_col_name;	 	
+	 	exit when C%notfound;
+	 	DBMS_OUTPUT.PUT_LINE(v_col_name);
+	 END LOOP;
+	 COMMIT;
+ END;
+
+--session 2
+DELETE FROM mult_version_teste;
+
+COMMIT;
+
+SELECT * FROM mult_version_teste;

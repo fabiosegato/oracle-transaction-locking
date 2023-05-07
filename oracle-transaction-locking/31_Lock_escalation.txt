@@ -1,0 +1,7 @@
+Quando nós referimos ao lock escalation no oracle não tem o mesmo significado que em outras base de dados, é muito comum em outras bases de dados, ao se alterar um registro esse lock não fica restrito somente ao registro, ele se progapa (escala) para a tabela toda.
+O Oracle sempre mantêm o lock no menor nível possível, porém para garantir a consistência dos dados em um ambiente de concorrência o ORACLE aplica algumas regras referente aos locks.
+
+Quando se altera somente um registro a tabela recebe um lock compartilhado no nível de registro.
+Quando se altera a estrutura de uma tabela a tabela recebe um lock exclusivo. Ou seja até que a estrutura seja alterada nenhuma outra sessões será capaz de alterar os dados dessa tabela.
+Para que um lock exclusivo seja atrinuído a uma tabela essa tabela não pode ter nenhum lock compartilhado no momento.
+

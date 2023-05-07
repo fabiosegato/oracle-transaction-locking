@@ -1,0 +1,43 @@
+Ao longos dos anos venho trabalhando com desenvolvimento de sistemas voltados para banco dados relacionais, 
+e na esmagadora maioria dos casos o que encontrei ao longo desse caminho foi equipes de desenvolvimento completamente despreparadas no que tanje a arquitetura do banco de dados para o qual estão realizando o seu desenvolvimento.
+Algo bem comum de se escutar no mercado são frases como "banco de dados é tudo igual", "eles já trabalharam com SQL server, então ORACLE é tranquilo" entre outras. Porém essa é uma afirmação falsa!
+Todo banco de dados relacional tem como objetivo a implementação de algumas características de transação conhecidas como propriedades ACID (Atomicity, Consistency, Isolation, Durability), o que difere uma tecnologia de outra é como cada uma implementa essas características. Portanto vamos discorrer sobre elas.
+Tendo em mente que o conceito de transação é: um conjunto de instruções executas como uma fossem algo único, podemos descrever cada propriedade ACID.
+
+Atomicity: É a propriedade de que uma transação acontece por completo ou ela não acontece, não existe transação pela metade, transação é uma uma unidade lógica única.
+Consistency: É a propriedade que garante que o estado dos dados manipulados são registrados por completo ou em caso de falha o estado deve retroceder ao ponto anterior da transação ter sido iniciada.
+Isolation: É a propriedade de que uma transação não pode interferir em outra enquanto não forem validadas, as transações devem ser processadas isoladamente até serem validadas ou serem revertidas.
+Durabilty: É a propriedade que garante que uma transação validada nunca será perdida mesmo que ocorra uma falha do sistema.
+
+Como dito anteriormente cada tecnologia tem uma arquitetura própia para implantar essas propriedades, o Oracle acaba se utilizando dos recursos abaixo para implementar grande parte dessas propriedades.
+
+Locks
+O recurso de lock é utilizado para impedir que dois usuários consigam alterar o estado do mesmo dado ao mesmo tempo. 
+Como exemplo podemos utilizar uma tabela de clientes, em um cenário onde dois usuários querem alterar a informação de data de nascimento do mesmo cliente ao mesmo tempo, isso não será possivel.
+Para tal o oracle implementa o que chamamos de lock de registro, o oracle bloquear o acesso para alteração naquele registro enquanto a primeira alteração é realizada e continuará bloqueada até que essa alteração seja validada pelo usuário, 
+só então o segundo usuário terá acesso a alterar esse mesmo registro,  a grosso modo o oracle enfileira as requisições de alteração no registro.
+É importante salientar que uma atualização no registro nunca gera um bloqueio de leitura no oracle, assim como leituras nunca geram bloqueios de alteração.
+Em outras tecnologias isso não é verdade, por exemplo no SQLserver o lock é feito via paginação, logo quando algum usuário estã alterando algum registro da tabela o SQLSERVER bloqueia boa parte do acesso a essa tabela, tanto para leitura quanto para escrita.
+Esse tipo de comportamente muitas vezes acaba gerando muitas contenções na base de dados, isso leva com que os desenvolvedores evitem transações muitos longas, pois quanto mais tempo levar sua transação, mais tempo os dados daquela tabela irá estar bloqueado tanto para escrita quando para leitura.
+Algo similar não acontece no ORACLE.
+
+Concurrency
+O lock citado acima é um dos responsáveis por permitir concorrência de acesso de modificação em uma base de dados ORACLE, quando dois usuários tentam modificar o mesmo dado ao mesmo tempo o recurso que gerencia esse acesso é o lock, garante que haja concorrência e que essa concorrência seja ao máximo compartilhável.
+Como a base de dados ORACLE tem o menor grão de lock no nível de registro, somente quando há uma disputa de acesso de modificação ao mesmo registro é onde processos paralelos se tornam sequenciais, para todo resto de modo geral os recursos continuão sendo compartilháveis.
+Caso estejamos falando de uma base de dados que gera locks em nível de páginação de tabelas por exemplo, boa parte dos dados ficarão em estado não compartilháveis para outros usuários, ou seja mais tarefas serão sequencializadas nessa base de dados, haverão mais gargalos de recursos.
+Em diversos casos esse tipo de implementação acaba gerando pouca escablidade do sistema, degradação de performance e até mesmo perda da integridade dos dados, já que muitos vezes para evitar locks na aplicação os desenvolvedores niglegenciam tratamento de transações pela base de dados e deixam essa função para a aplicação.
+Testar uma aplicação em relação a concorrência é uma tarefa muito difícil de ser feita, normalmente aplicações funcionam perfeitamente quando testadas no cenário single user, porém em ambiente produtivo onde há diversos acessos simultâneos a aplicação falha terrivelmente, e esse cenário é muito difícil de reproduzir em um ambiente controlado.
+Por isso é de extrema importância entender como esses mecanismos funcionam e aplica-los desde a concepção do seu sistema.
+
+Multiversioning
+Como dito anteriormente no oracle uma alteração no dado nunca bloqueia o acesso de leitura assim como uma leitura nunca bloqueia o acesso de alteração.
+E como isso é possível? O oracle se utiliza de um recurso de multiversionamento do dados, ou seja o oracle mantém uma versão anterior do dados que está sendo modificado e aidna não valido, permitindo assim que a alteração ainda não validada seja transparente para as sessões concorrentes.
+Ou seja quando alguma uma sessão consulta o dado que está sendo alterado por uma segunda sessão concorrente para quem está lendo o dado está sendo lido da versão anterior da modificação, permitindo assim oque chamamos de leitura consistente.
+O conceito de leitura consistente é sempre garantir que o dado retornado será fiel ao momento que a consulta foi feita, mesmo que outras sessões tenham o alterado no meio do caminho até que a consulta termine.
+Mas como tudo esse recurso tem seus bonus e seus onus , irei abordar posteriormente quais são eles.
+
+Redo / Undo
+As estruturas que garantem a capacidade do Oracle fornecer a visão de multiversão são as estruturas de redo e undo.
+Redo registra todas as alterações que estão sendo feitas na base de dados então registra a versão mais atual do registro, caso haja uma falha de sistema, o redo consegue reaplicar essas alterações caso necessário.
+Undo registra a versão anterior da modificação, então em caso de leitura de um dado que está sendo alterado ou no caso de desfazer uma alteração ainda não valdada , é do UNDO que o ORACLE busca essas informações.
+Só por conta dessas duas estruturas é que é possível existir o cenário que vimos anteriormente.

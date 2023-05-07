@@ -1,0 +1,17 @@
+Sempre que uma sessão tenta acessar um recurso que está com lock essa sessão fica bloqueado até que esse recurso seja liberado.
+Em sistemas bem construídos bloqueios de sessões tendem as serem situações raras, porém pela falta de conhecimento dos desenvolvedos esse cenário acaba sendo um cenário comum.
+Em um banco de dados Oracle todos comandos DML(INSERT,UPDATE,DELETE,MERGE,SELECT FOR UPDATE) pode causar bloqueios, para evitar que isso ocorra podemos utlizar de algumas técnicas para cada um dos cenários.
+
+SELECT FOR UPDATE:
+Como já vimos anteriormente podemos utilizar a clausula NOWAIT.
+
+INSERTS:
+Quando duas ou mais sessões tentam inserir dados em um tabela com a mesma chave primária. Esse cenário ocorre somente quando sistemas utilizam chaves naturais, por exemplo, CPF/CNPJ.
+Quando se utiliza UIDs ou sequences logo de cara eliminados esse problema , pois os sistema gerencia as chaves primárias evitando que ocorra duplicidade.
+Porém em um cenário onde já necessidade que a chave primária seja fornecida pelo usuário podemos utilizar a package DBMS_LOCK.
+(Exemplo1)
+
+MERGES, UPDATES DELETES:
+Em sistemas onde há locks para updates ou deletes provavelmente estará ocorrendo lost updates, as formas de evitar isso são as formas que já vimos anteriormente, utilizando as abordagens pessimista e otimista.
+Merges são a junção de updates deletes e inserts, logo as mesmas soluções implementadas em cada um dos casos podem ser aplicadas ao MERGE.
+

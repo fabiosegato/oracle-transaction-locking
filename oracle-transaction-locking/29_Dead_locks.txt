@@ -1,0 +1,11 @@
+Dead locks acontecem em base de dados ORACLE quando duas sessões geram locks e ficam bloqueadas de forma cruzada.
+Para melhor entendimento vejamos esse cenário:
+
+usuário1: atualiza registro do cliente 1 (registro ficará com lock)
+usuário2: atualiza registro do cliente 3 (registro ficará com lock)
+usuário1: atualiza registro do cliente 3 (sessão ficará bloqueada pela sessão do usuário 2 pois há um lock no registro do cliente 3)
+usuário2: atualiza registro do cliente 1 (sessão ficará bloqueada pela sessão do usuário 1 pois há um lock no registro do cliente 1)
+
+Nesse cenário as duas sessões estarão ds bloqueando, não havendo alternativa para que uma das sessões encerre a transação. 
+Portanto nesse cenário o Oracle é capaz de identificar esse bloqueido mútuo e ele mesmo resolve esse problema exibindo um erro em uma das sessões aleatoriamente e aplicando rollback.
+ORA-00060: deadlock detected while waiting for resource.

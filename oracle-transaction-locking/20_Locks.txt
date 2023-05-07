@@ -1,0 +1,7 @@
+Locks são mecanismos que proporcionam que um banco de dados relacional possa ser acessado por diversos usuários de forma concorrente.
+Esses mecanismos possibilitam o compartilhamento de recursos. Para o ORACLE isso se dá no nível mais baixo que o nível de registro, mas isso não se aplica a todos os bancos relacionais do mercado.
+Porém o ORACLE não só utiliza locks para registros, outro cenário seriam storege procedure , enquanto um usuário estiver executando uma procedure , outro usuário não conseguirá modificar essa procedure.
+Esse é só um exemplo, mas locks são utilizados para solucionar compartilhamento de diversos recursos em uma base de dados.
+Veja! Em uma base de dados single user, locks seriam desnecessários.
+
+É interessante abordarmos alguns problemas mais comuns relacionados a lock que encontrados em aplicações

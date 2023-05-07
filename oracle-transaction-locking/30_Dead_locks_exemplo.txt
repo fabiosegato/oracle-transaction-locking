@@ -1,0 +1,11 @@
+--SESSION 1
+UPDATE mult_version_teste SET NAME = 'FABIO SEGATO' WHERE ID = 1
+
+--SESSION 2
+UPDATE mult_version_teste SET NAME = 'BARBARA DOM' WHERE ID = 3
+
+--SESSION 1
+UPDATE mult_version_teste SET NAME = 'BARBARA DOM' WHERE ID = 3
+
+--SESSION 2
+UPDATE mult_version_teste SET NAME = 'FABIO SEGATO' WHERE ID = 1

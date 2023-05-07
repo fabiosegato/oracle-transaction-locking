@@ -1,0 +1,64 @@
+--SESSION 1
+
+DECLARE 
+V_ID mult_version_teste.ID%TYPE := 1;
+V_NAME mult_version_teste.NAME%TYPE;
+V_DT_BIRTH mult_version_teste.DT_BIRTH%TYPE;
+V_NM_BIRTH_CITY mult_version_teste.NM_BIRTH_CITY%TYPE;
+V_DT_LAST_UPDATE mult_version_teste.dt_last_update%TYPE;
+V_HASH mult_version_teste.HASH%TYPE;
+
+
+BEGIN 
+	
+SELECT NAME,DT_BIRTH,NM_BIRTH_CITY,DT_LAST_UPDATE,HASH INTO V_NAME,V_DT_BIRTH,V_NM_BIRTH_CITY,V_DT_LAST_UPDATE,V_HASH FROM mult_version_teste WHERE ID = V_ID;
+		
+dbms_output.put_line(v_hash);
+	
+	sys.DBMS_LOCK.SLEEP (20);
+	
+	UPDATE mult_version_teste SET NAME = V_NAME , DT_BIRTH = TO_DATE('19800506','YYYYMMDD') , NM_BIRTH_CITY = V_NM_BIRTH_CITY
+	,DT_LAST_UPDATE = V_DT_LAST_UPDATE,HASH = ORA_HASH(NAME || '/' || TO_DATE('19800506','YYYYMMDD') || '/' || NM_BIRTH_CITY)
+	WHERE ID = V_ID
+    AND HASH = V_HASH;
+	
+   
+	IF (sql%rowcount=0) THEN
+		raise_application_error(-20111,'Registro já foi alterado por outra usuário, refazer a alteração');
+        END IF; 
+
+COMMIT;
+
+END;
+
+--SESSION 2
+
+DECLARE 
+V_ID mult_version_teste.ID%TYPE := 1;
+V_NAME mult_version_teste.NAME%TYPE;
+V_DT_BIRTH mult_version_teste.DT_BIRTH%TYPE;
+V_NM_BIRTH_CITY mult_version_teste.NM_BIRTH_CITY%TYPE;
+V_DT_LAST_UPDATE mult_version_teste.dt_last_update%TYPE;
+V_HASH mult_version_teste.HASH%TYPE;
+
+
+BEGIN 
+	
+SELECT NAME,DT_BIRTH,NM_BIRTH_CITY,DT_LAST_UPDATE,HASH INTO V_NAME,V_DT_BIRTH,V_NM_BIRTH_CITY,V_DT_LAST_UPDATE,V_HASH FROM mult_version_teste WHERE ID = V_ID;
+		
+	dbms_output.put_line(v_hash);
+
+	sys.DBMS_LOCK.SLEEP (40);
+	
+	UPDATE mult_version_teste SET NAME = V_NAME , DT_BIRTH = V_DT_BIRTH , NM_BIRTH_CITY = 'SANTOS'
+	,DT_LAST_UPDATE = V_DT_LAST_UPDATE,HASH = ORA_HASH(NAME || '/' || DT_BIRTH || '/' || 'SANTOS')
+	WHERE ID = V_ID
+    AND HASH = V_HASH;
+	
+	IF (sql%rowcount=0) THEN
+		raise_application_error(-20111,'Registro já foi alterado por outra usuário, refazer a alteração');
+        END IF; 
+
+COMMIT;
+
+END;
